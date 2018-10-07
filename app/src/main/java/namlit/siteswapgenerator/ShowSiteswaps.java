@@ -205,7 +205,7 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
 
     private void loadSiteswaps() {
 
-        //GET THIS HOOKED UP TO GITHUB
+        //testing github
 
         //WHAT I HAVE NOW IS A HIJACKED SETUP THAT USEES THE PARAMS ABOVE INSTEAD OF WHAT IS INPUT,
         //  NEXT THING TO DO IS MAKE IT CYCLE THROUGH HIJACKED PARAMS BASED ON INPUT PARAMS, AND AS IT CYCLES THROUGH
