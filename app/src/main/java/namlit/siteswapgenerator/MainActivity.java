@@ -385,8 +385,7 @@ public class MainActivity extends AppCompatActivity
 
     public void generateSiteswaps(View view) {
 
-        ShowSiteswaps.canRunLoadSiteswaps = false; //tj this was not here, i made it to try and keep
-        // ShowSiteswaps.LoadSiteswaps from running in a loop
+        ShowSiteswaps.iterationCount = 0;
 
 
         if (!updateFromTextEdits())

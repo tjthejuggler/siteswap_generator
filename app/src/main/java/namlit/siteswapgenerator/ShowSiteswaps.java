@@ -54,7 +54,11 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
     private SiteswapGenerationFragment mSiteswapGenerationFragment;
     private ShareActionProvider mShareActionProvider;
 
-    public static boolean canRunLoadSiteswaps = true; //tj this was made by me to try and stop the endless loop
+    //tj these were made by me
+    public static int iterationCount = 0;
+    public static LinkedList<Siteswap> unfilteredListOfSiteswaps = new LinkedList<Siteswap>();
+    public static LinkedList<Siteswap> filteredListOfSiteswaps = new LinkedList<Siteswap>();
+
 
     ListView mSiteswapListView;
 
@@ -148,11 +152,9 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
 
         Log.d(TAG, "filterBasedOnLearnSiteswap: HERE AGAIN");
 
-        canRunLoadSiteswaps = false; //tj this is part of my atttempt to keep the endless loop frm happening
+        //mSiteswapList = mGenerator.getSiteswaps();
 
-        mSiteswapList = mGenerator.getSiteswaps();
-
-        listToReturn.addAll(mSiteswapList);
+        //listToReturn.addAll(mSiteswapList);
 
         return listToReturn;
     }
@@ -160,11 +162,41 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
 //this whole function made by me(after the function above)
 
     public void generateSiteswapsWithoutButton(){
+
         Integer mPeriodLength = 4;
+//        if (iterationCount==0) {
+//            mPeriodLength = 3;
+//        }
+//        if (iterationCount==1) {
+//            mPeriodLength = 4;
+//        }
+//        if (iterationCount==2) {
+//            mPeriodLength = 5;
+//        }
+//        if (iterationCount==3) {
+//            mPeriodLength = 6;
+//        }
+
         Integer mMaxThrow = 10;
         Integer mMinThrow = 0;
         Integer mNumberOfObjects = 4;
+
+
+        if (iterationCount==0) {
+            mNumberOfObjects = 3;
+        }
+        if (iterationCount==1) {
+            mNumberOfObjects = 4;
+        }
+        if (iterationCount==2) {
+            mNumberOfObjects = 5;
+        }
+        if (iterationCount==3) {
+            mNumberOfObjects = 6;
+        }
+
         Integer mNumberOfJugglers = 1;
+
         LinkedList<Filter> mFilterList = new LinkedList<Filter>();
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
@@ -183,7 +215,7 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
             }
         }
 
-        Integer mMaxResults = 100;
+        Integer mMaxResults = 10000;
         Integer mTimeout = 10;
         boolean mIsRandomGenerationMode = false;
 
@@ -197,25 +229,35 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
         intent.putExtra(getString(R.string.intent__siteswap_generator), siteswapGenerator);
         startActivity(intent);
 
-        canRunLoadSiteswaps = true;
+
 
     }
 
 //the begining of this function heavily edited by me, after the two functions above
 
+
+
     private void loadSiteswaps() {
+
+        //CURRENT ISSUES/TODOs:
+        //  -it is putting too many activities in the stack
+        //  -for some reason when I put iterationCount=0; in if (iterationCount > 3) {
+        //      i just get an endless loop
+        //  -the list i end up with needs sorted somehow
+        //  -i need to make a new edittext for it to get the target siteswap from, or maybe a comma seperated list of components
+        //  -i need to make the filter function do its thing based on a siteswap, not just a single component
 
         //testing github
 
-        //WHAT I HAVE NOW IS A HIJACKED SETUP THAT USEES THE PARAMS ABOVE INSTEAD OF WHAT IS INPUT,
+        //WHAT I HAVE NOW IS A HIJACKED SETUP THAT USES THE PARAMS ABOVE INSTEAD OF WHAT IS INPUT,
         //  NEXT THING TO DO IS MAKE IT CYCLE THROUGH HIJACKED PARAMS BASED ON INPUT PARAMS, AND AS IT CYCLES THROUGH
         //  KEEP TRACK OF THE RESULTS, ONCE WE HAVE ALL THE RESULTS WE WANT, WE FILTER OUT WHAT WE DONT WANT BASED ON THE SITESWAP
         //  WE ARE TRYING TO LEARN, AND PUT WHAT REMAINS INTO THE ADAPTER TO BE SHOWN
 
 
         //When I get here I should have an iteration number, if the iteration number is as high as it can go, then
-        //  I go on with creating the adapter, but if it isn't, then I use that iteration number to run MainActivity.generateSiteswaps again
-        if (!canRunLoadSiteswaps) {
+        //  I go on with creating the adapter, but if it isn't, then I use that iteration number to run generateSiteswapsWithoutButton() again
+        if (iterationCount < 4) {
 
             //before we do this we want to put the current results into a global linkedlist which
             //will have the results from generateSiteswapsWithoutButton() added to it on the second
@@ -223,23 +265,32 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
             //trying to commit.....
 
             generateSiteswapsWithoutButton();
+            //mSiteswapList.clear();
+            mSiteswapList = mGenerator.getSiteswaps();//tj instead of plugging this into our adapter, we wan to just shovel all the results
+            unfilteredListOfSiteswaps.addAll(mSiteswapList);
+            //into a static LinkedList and run then run the whole thing again with slightly different params, like 1 less ball
+            iterationCount++;
         }
 
-        if (canRunLoadSiteswaps) {//tj this was made by me to try and stop the endless loop, BUT
+
+
+
+
+
+        if (iterationCount > 3) {//tj this was made by me to try and stop the endless loop, BUT
             //I think we should use something else like a public static int that counts cycles, so we can cycle through a
             //certain number of times with different parameters.maybe limit it at up to 3 balls less than the input number and
             //  three period lengths less than the input number since that would be 9 cycles through, maybe we could up period
             //  length to 4 or 5
+            //iterationCount=0;
+            //mSiteswapList = mGenerator.getSiteswaps();//tj instead of plugging this into our adapter, we wan to just shovel all the results
 
 
-            mSiteswapList = mGenerator.getSiteswaps();//tj instead of plugging this into our adapter, we wan to just shovel all the results
-            //into a static LinkedList and run then run the whole thing again with slightly different params, like 1 less ball
-
-            //mSiteswapList = filterBasedOnLearnSiteswap(mSiteswapList);//tj this method was made by me
+            filteredListOfSiteswaps = filterBasedOnLearnSiteswap(unfilteredListOfSiteswaps);//tj this method was made by me
 
 
             ArrayAdapter adapter = new ArrayAdapter<Siteswap>(
-                    ShowSiteswaps.this, android.R.layout.simple_list_item_1, mSiteswapList);
+                    ShowSiteswaps.this, android.R.layout.simple_list_item_1, filteredListOfSiteswaps);
             mSiteswapListView.setAdapter(adapter);
             mSiteswapListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -253,26 +304,29 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
             });
 
 
-            switch (mGenerationStatus) {
-                case GENERATING:
-                    setTitle(String.format(getString(R.string.show_siteswaps__title_generating)));
-                    break;
-                case ALL_SITESWAPS_FOUND:
-                    setTitle(String.format(getString(R.string.show_siteswaps__title_found_all), mSiteswapList.size()));
-                    break;
-                case MAX_RESULTS_REACHED:
-                    setTitle(String.format(getString(R.string.show_siteswaps__title_limit_reached), mSiteswapList.size()));
-                    break;
-                case TIMEOUT_REACHED:
-                    setTitle(String.format(getString(R.string.show_siteswaps__title_timeout_reached), mSiteswapList.size()));
-                    break;
-                case MEMORY_FULL:
-                    setTitle(String.format(getString(R.string.show_siteswaps__title_memory_full), mSiteswapList.size()));
-                    break;
-                case CANCELLED:
-                    setTitle(String.format(getString(R.string.show_siteswaps__title_cancelled)));
-                    break;
-            }
+//            switch (mGenerationStatus) {
+//                case GENERATING:
+//                    setTitle(String.format(getString(R.string.show_siteswaps__title_generating)));
+//                    break;
+//                case ALL_SITESWAPS_FOUND:
+//                    setTitle(String.format(getString(R.string.show_siteswaps__title_found_all), mSiteswapList.size()));
+//                    break;
+//                case MAX_RESULTS_REACHED:
+//                    setTitle(String.format(getString(R.string.show_siteswaps__title_limit_reached), mSiteswapList.size()));
+//                    break;
+//                case TIMEOUT_REACHED:
+//                    setTitle(String.format(getString(R.string.show_siteswaps__title_timeout_reached), mSiteswapList.size()));
+//                    break;
+//                case MEMORY_FULL:
+//                    setTitle(String.format(getString(R.string.show_siteswaps__title_memory_full), mSiteswapList.size()));
+//                    break;
+//                case CANCELLED:
+//                    setTitle(String.format(getString(R.string.show_siteswaps__title_cancelled)));
+//                    break;
+//            }
+
+            //unfilteredListOfSiteswaps.clear();
+
         }
     }
 
