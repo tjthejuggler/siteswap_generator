@@ -38,7 +38,9 @@ import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import siteswaplib.Filter;
 import siteswaplib.SiteswapGenerator;
@@ -133,17 +135,47 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
     }
 
     //tj this whole method was made by me
+    public ArrayList<String> getComponentsFromSiteswapToLearn(Integer siteswapToLearn) {
+        ArrayList<String> siteswapComponents = new ArrayList<>();
+        String siteswapToLearnDoubled = Integer.toString(siteswapToLearn) + Integer.toString(siteswapToLearn);
+        int siteswapLength = String.valueOf(siteswapToLearn).length();
+        List<Integer> digitsThatCanBeInSiteswaps = new ArrayList<>();
+        digitsThatCanBeInSiteswaps.add(0);
+        digitsThatCanBeInSiteswaps.add(2);
+        for (int startingDigitIndex = 0; startingDigitIndex<siteswapLength;startingDigitIndex++){
+            Integer startingDigit = Integer.parseInt(Integer.toString(siteswapToLearn).substring(startingDigitIndex, startingDigitIndex+1));
+            if (!digitsThatCanBeInSiteswaps.contains(startingDigit)) {
+                digitsThatCanBeInSiteswaps.add(startingDigit);
+            }
+
+            for (int componentLength = 2; componentLength < siteswapLength;componentLength++){
+                String componentToPossiblyAddToList = siteswapToLearnDoubled.substring(startingDigitIndex,startingDigitIndex+componentLength);
+                if (!siteswapComponents.contains(componentToPossiblyAddToList)) {
+                    siteswapComponents.add(componentToPossiblyAddToList);
+                    Log.d(TAG, "componentToPossiblyAddToList: "+componentToPossiblyAddToList);
+                }
+            }
+        }
+        return siteswapComponents;
+    }
+
+    //tj this whole method was made by me
     public LinkedList<Siteswap> filterBasedOnLearnSiteswap(LinkedList<Siteswap> mSiteswapList){
 
+        Integer siteswapToLearn = 7531;
+        ArrayList<String> siteswapComponents = new ArrayList<>();
+        siteswapComponents = getComponentsFromSiteswapToLearn(siteswapToLearn);
         LinkedList<Siteswap> listToReturn = new LinkedList<>();
-
         listToReturn.addAll(mSiteswapList);
-
         //this succesfully filters out siteswap results that dont have 53 in them
         if (listToReturn.size() > 0) {
-            for (int i = 0; i < listToReturn.size(); i++) {
-                if (!listToReturn.get(i).toString().contains("53")) {
-                    listToReturn.remove(i);
+            for (int indexOfPotentialSiteswap = 0; indexOfPotentialSiteswap < listToReturn.size(); indexOfPotentialSiteswap++) {
+                for //here, instead of just checking with 53, we want to check it up against every component in the list we made,
+                //  if it doesnt contain any of them, then we want to remove it.
+                // A thing to do after this would be to also get our list of digitsThatCanBeInSiteswaps passed in from
+                //      the siteswapComponents method and make sure that the other digits in the potentialSiteswap are in that list
+                if (!listToReturn.get(indexOfPotentialSiteswap).toString().contains("53")) {
+                    listToReturn.remove(indexOfPotentialSiteswap);
                     i=i-1;
                 }
             }
