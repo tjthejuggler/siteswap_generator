@@ -162,7 +162,7 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
     //tj this whole method was made by me
     public LinkedList<Siteswap> filterBasedOnLearnSiteswap(LinkedList<Siteswap> listThatNeedsFiltered){
 
-        Integer siteswapToLearn = 7531;
+        Integer siteswapToLearn = 975318642;
         ArrayList<String> siteswapComponents = new ArrayList<>();
         siteswapComponents = getComponentsFromSiteswapToLearn(siteswapToLearn);
         LinkedList<Siteswap> listToReturn = new LinkedList<>();
@@ -243,8 +243,8 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
             }
         }
 
-        Integer mMaxResults = 10000;
-        Integer mTimeout = 10;
+        Integer mMaxResults = 1000;
+        Integer mTimeout = 5;
         boolean mIsRandomGenerationMode = false;
 
         SiteswapGenerator siteswapGenerator = new SiteswapGenerator(mPeriodLength, mMaxThrow,
@@ -255,20 +255,13 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
 
         Intent intent = new Intent(this, ShowSiteswaps.class);
         intent.putExtra(getString(R.string.intent__siteswap_generator), siteswapGenerator);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//this line gets rid of the extra activites I create by cycling through
+                                                        //the process to to get siteswaps with different lengths/object numbers
         startActivity(intent);
-
-
-
     }
-
-//the begining of this function heavily edited by me, after the two functions above
-
-
-
     private void loadSiteswaps() {
 
         //CURRENT ISSUES/TODOs:
-        //  -it is putting too many activities in the stack
         //  -for some reason when I put iterationCount=0; in if (iterationCount > 3) {
         //      i just get an endless loop
         //  -the list i end up with needs sorted somehow
@@ -286,12 +279,10 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
         //When I get here I should have an iteration number, if the iteration number is as high as it can go, then
         //  I go on with creating the adapter, but if it isn't, then I use that iteration number to run generateSiteswapsWithoutButton() again
         if (iterationCount < 4) {
-
             //before we do this we want to put the current results into a global linkedlist which
             //will have the results from generateSiteswapsWithoutButton() added to it on the second
             //run through this function. hopefully that will result in a list on the phone that has both params ........
             //trying to commit.....
-
             generateSiteswapsWithoutButton();
             //mSiteswapList.clear();
             mSiteswapList = mGenerator.getSiteswaps();//tj instead of plugging this into our adapter, we wan to just shovel all the results
@@ -299,24 +290,14 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
             //into a static LinkedList and run then run the whole thing again with slightly different params, like 1 less ball
             iterationCount++;
         }
-
-
-
-
-
-
-        if (iterationCount > 3) {//tj this was made by me to try and stop the endless loop, BUT
+        if (iterationCount == 4) {//tj this was made by me to try and stop the endless loop, BUT
             //I think we should use something else like a public static int that counts cycles, so we can cycle through a
             //certain number of times with different parameters.maybe limit it at up to 3 balls less than the input number and
             //  three period lengths less than the input number since that would be 9 cycles through, maybe we could up period
             //  length to 4 or 5
             //iterationCount=0;
             //mSiteswapList = mGenerator.getSiteswaps();//tj instead of plugging this into our adapter, we wan to just shovel all the results
-
-
             filteredListOfSiteswaps = filterBasedOnLearnSiteswap(unfilteredListOfSiteswaps);//tj this method was made by me
-
-
             ArrayAdapter adapter = new ArrayAdapter<Siteswap>(
                     ShowSiteswaps.this, android.R.layout.simple_list_item_1, filteredListOfSiteswaps);
             mSiteswapListView.setAdapter(adapter);
