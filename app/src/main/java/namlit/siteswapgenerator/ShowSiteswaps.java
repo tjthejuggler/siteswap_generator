@@ -160,34 +160,30 @@ public class ShowSiteswaps extends AppCompatActivity implements SiteswapGenerati
     }
 
     //tj this whole method was made by me
-    public LinkedList<Siteswap> filterBasedOnLearnSiteswap(LinkedList<Siteswap> mSiteswapList){
+    public LinkedList<Siteswap> filterBasedOnLearnSiteswap(LinkedList<Siteswap> listThatNeedsFiltered){
 
         Integer siteswapToLearn = 7531;
         ArrayList<String> siteswapComponents = new ArrayList<>();
         siteswapComponents = getComponentsFromSiteswapToLearn(siteswapToLearn);
         LinkedList<Siteswap> listToReturn = new LinkedList<>();
-        listToReturn.addAll(mSiteswapList);
-        //this succesfully filters out siteswap results that dont have 53 in them
-        if (listToReturn.size() > 0) {
+        listToReturn.addAll(listThatNeedsFiltered); //we fill our list to return up and then..
+        if (listToReturn.size() > 0) {//..we cycle through each siteswap in it..
             for (int indexOfPotentialSiteswap = 0; indexOfPotentialSiteswap < listToReturn.size(); indexOfPotentialSiteswap++) {
-                for //here, instead of just checking with 53, we want to check it up against every component in the list we made,
-                //  if it doesnt contain any of them, then we want to remove it.
-                // A thing to do after this would be to also get our list of digitsThatCanBeInSiteswaps passed in from
-                //      the siteswapComponents method and make sure that the other digits in the potentialSiteswap are in that list
-                if (!listToReturn.get(indexOfPotentialSiteswap).toString().contains("53")) {
+                boolean containsComponent = false;
+                for (int indexOfCurrentComponent = 0; indexOfCurrentComponent < siteswapComponents.size(); indexOfCurrentComponent++){
+                    if (listToReturn.get(indexOfPotentialSiteswap).toString().contains(siteswapComponents.get(indexOfCurrentComponent))){
+                        containsComponent = true;//..to see if the contain any of our components..
+                    }
+                }
+                if (!containsComponent) {//..if the don't, then we remove them from the list to return..
                     listToReturn.remove(indexOfPotentialSiteswap);
-                    i=i-1;
+                    indexOfPotentialSiteswap=indexOfPotentialSiteswap-1;//..and remove 1 from our current index..
                 }
             }
-        }
-
-
+        }//todo: we need to test this function
         Log.d(TAG, "filterBasedOnLearnSiteswap: HERE AGAIN");
-
         //mSiteswapList = mGenerator.getSiteswaps();
-
         //listToReturn.addAll(mSiteswapList);
-
         return listToReturn;
     }
 
